@@ -53,8 +53,7 @@ function sumOfDifferences(vector1, vector2) {
   }
   
 
-// Example usage
-const filePath = './inputday1.txt'; // Replace with your file path
+const filePath = './inputday1.txt'; 
 const { vector1, vector2 } = readNumbersIntoVectors(filePath);
 console.log('Vector 1:', vector1);
 console.log('Vector 2:', vector2);
