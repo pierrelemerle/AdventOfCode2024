@@ -52,15 +52,5 @@ function sumOfDifferences(vector1, vector2) {
     return sum;
   }
   
-
-const filePath = './inputday1.txt'; 
-const { vector1, vector2 } = readNumbersIntoVectors(filePath);
-console.log('Vector 1:', vector1);
-console.log('Vector 2:', vector2);
-
-try {
-    const differenceSum = sumOfDifferences(vector1, vector2);
-    console.log('Sum of differences:', differenceSum);
-  } catch (err) {
-    console.error(err.message);
-  }
+// Export both functions
+module.exports = { readNumbersIntoVectors, sumOfDifferences };
