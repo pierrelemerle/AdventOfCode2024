@@ -51,6 +51,10 @@ public class Day07Util {
         backtrack(nums, index + 1, current + nums.get(index), results);
         // Multiply
         backtrack(nums, index + 1, current * nums.get(index), results);
+        // Concatenate for part2 of the puzzle
+        String concatenate = current.toString() + nums.get(index).toString();
+        backtrack(nums, index + 1, Long.parseLong(concatenate), results);
+
     }
 
 }
