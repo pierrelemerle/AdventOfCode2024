@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String filePath = "resources/inputexemple.txt";
+        String filePath = "resources/input.txt";
 
         try {
             char[][] map = Helper.readFileToTabTabChar(filePath);

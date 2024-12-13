@@ -1,14 +1,16 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Day12Util {
 
     public static int findASpecificReginCost(char[][] map, int y, int x) {
         AtomicInteger regionSize = new AtomicInteger(0);
-        List<Point2D> existingFence = new ArrayList<>();
+        HashMap<Point2D, List<Character>> existingFence = new HashMap<>();
         char plantType = map[y][x];
 
         // check next area (if in the grid)
@@ -27,7 +29,7 @@ public class Day12Util {
 
     // call the recursive function and check all the Paths
     public static void buildWholeRegion(char[][] map, int y, int x, AtomicInteger regionSize,
-            List<Point2D> existingFence,
+            HashMap<Point2D, List<Character>> existingFence,
             char plantType) {
         regionSize.getAndIncrement();
         // remove the letter not to count it several times.
@@ -36,29 +38,29 @@ public class Day12Util {
         // add the 4 fences in the fencelist if not there already, otherwise they should
         // be removed
         Point2D target = new Point2D.Double(y - 0.5, x);
-        if (!existingFence.contains(target)) {
-            existingFence.add(target);
+        if (!existingFence.containsKey(target)) {
+            existingFence.computeIfAbsent(target, k -> new ArrayList<>()).add('S');
         } else {
             existingFence.remove(target);
         }
 
         target = new Point2D.Double(y + 0.5, x);
-        if (!existingFence.contains(target)) {
-            existingFence.add(target);
+        if (!existingFence.containsKey(target)) {
+            existingFence.computeIfAbsent(target, k -> new ArrayList<>()).add('N');
         } else {
             existingFence.remove(target);
         }
 
         target = new Point2D.Double(y, x - 0.5);
-        if (!existingFence.contains(target)) {
-            existingFence.add(target);
+        if (!existingFence.containsKey(target)) {
+            existingFence.computeIfAbsent(target, k -> new ArrayList<>()).add('W');
         } else {
             existingFence.remove(target);
         }
 
         target = new Point2D.Double(y, x + 0.5);
-        if (!existingFence.contains(target)) {
-            existingFence.add(target);
+        if (!existingFence.containsKey(target)) {
+            existingFence.computeIfAbsent(target, k -> new ArrayList<>()).add('E');
         } else {
             existingFence.remove(target);
         }
@@ -75,45 +77,13 @@ public class Day12Util {
 
     }
 
-    // private static int calculateFenceCostDiscount(List<Point2D> existingFence) {
-    // int totalcost = existingFence.size();
-    // boolean touching = false;
-
-    // for (int i = 0; i < existingFence.size(); i++) {
-    // Point2D target = existingFence.get(i);
-    // if (target.getX() % 1 == 0.5) {
-    // for (int j = 0; j < existingFence.size(); j++) {
-    // if (existingFence.get(j).getY() == target.getY()
-    // && (existingFence.get(j).getX() == target.getX() - 1
-    // || existingFence.get(j).getX() == target.getX() + 1))
-    // touching = true;
-    // }
-    // } else {
-    // for (int j = 0; j < existingFence.size(); j++) {
-    // if (existingFence.get(j).getX() == target.getX()
-    // && (existingFence.get(j).getY() == target.getY() - 1
-    // || existingFence.get(j).getY() == target.getY() + 1))
-    // touching = true;
-    // }
-    // }
-    // if (touching)
-    // totalcost--;
-    // touching = false;
-    // }
-    // System.out.println(totalcost);
-    // return totalcost;
-    // }
-
-    private static int calculateFenceCostDiscount(List<Point2D> existingFence, int dimension) {
+    private static int calculateFenceCostDiscount(HashMap<Point2D, List<Character>> existingFence, int dimension) {
         boolean touching = false;
         int nbFence = 0;
         List<Integer> fences = new ArrayList<>();
 
         for (double x = -0.5; x < dimension; x++) {
-            for (int i = 0; i < existingFence.size(); i++) {
-                if (existingFence.get(i).getX() == x)
-                    fences.add((int) existingFence.get(i).getY());
-            }
+            fences = getMatchingYCoordinates(existingFence, x, 'S');
             Collections.sort(fences);
             // count the total
             for (int i = 0; i < dimension; i++) {
@@ -127,13 +97,7 @@ public class Day12Util {
                 }
             }
             touching = false;
-            fences = new ArrayList<>();
-        }
-        for (double y = -0.5; y < dimension; y++) {
-            for (int i = 0; i < existingFence.size(); i++) {
-                if (existingFence.get(i).getY() == y)
-                    fences.add((int) existingFence.get(i).getX());
-            }
+            fences = getMatchingYCoordinates(existingFence, x, 'N');
             Collections.sort(fences);
             // count the total
             for (int i = 0; i < dimension; i++) {
@@ -150,8 +114,76 @@ public class Day12Util {
             fences = new ArrayList<>();
         }
 
-        // do same for y.
+        for (double y = -0.5; y < dimension; y++) {
+            fences = getMatchingXCoordinates(existingFence, y, 'W');
+            Collections.sort(fences);
+            // count the total
+            for (int i = 0; i < dimension; i++) {
+                if (fences.contains(i)) {
+                    if (!touching) {
+                        nbFence++;
+                    }
+                    touching = true;
+                } else {
+                    touching = false;
+                }
+            }
+            touching = false;
+            fences = getMatchingXCoordinates(existingFence, y, 'E');
+            Collections.sort(fences);
+            // count the total
+            for (int i = 0; i < dimension; i++) {
+                if (fences.contains(i)) {
+                    if (!touching) {
+                        nbFence++;
+                    }
+                    touching = true;
+                } else {
+                    touching = false;
+                }
+            }
+            touching = false;
+            fences = new ArrayList<>();
+        }
         return nbFence;
+    }
+
+    private static List<Integer> getMatchingYCoordinates(
+            HashMap<Point2D, List<Character>> map,
+            double targetX,
+            char targetChar) {
+        List<Integer> result = new ArrayList<>();
+
+        for (Map.Entry<Point2D, List<Character>> entry : map.entrySet()) {
+            Point2D key = entry.getKey();
+            List<Character> value = entry.getValue();
+
+            // Check if x-coordinate matches and list contains the character
+            if (key.getX() == targetX && value.contains(targetChar)) {
+                result.add((int) key.getY()); // Cast y-coordinate to integer
+            }
+        }
+
+        return result;
+    }
+
+    private static List<Integer> getMatchingXCoordinates(
+            HashMap<Point2D, List<Character>> map,
+            double targetY,
+            char targetChar) {
+        List<Integer> result = new ArrayList<>();
+
+        for (Map.Entry<Point2D, List<Character>> entry : map.entrySet()) {
+            Point2D key = entry.getKey();
+            List<Character> value = entry.getValue();
+
+            // Check if x-coordinate matches and list contains the character
+            if (key.getY() == targetY && value.contains(targetChar)) {
+                result.add((int) key.getX()); // Cast y-coordinate to integer
+            }
+        }
+
+        return result;
     }
 
 }
