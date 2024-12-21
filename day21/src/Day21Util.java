@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.Point;
 
 public class Day21Util {
 
@@ -398,6 +397,132 @@ public class Day21Util {
         long codeInt = Long.parseLong(code);
         complexity = codeInt * sequence.length();
         return complexity;
+    }
+
+    static String deplacerEnX(int dx) {
+        return switch (dx) {
+            case 0 -> "";
+            case 1, 2, 3 -> "v".repeat(dx);
+            case -1, -2, -3 -> "^".repeat(-dx);
+            default -> throw new IllegalStateException("Valeur inattendue : " + dx);
+        };
+    }
+
+    static String deplacerEnY(int dy) {
+        return switch (dy) {
+            case 0 -> "";
+            case 1, 2, 3 -> ">".repeat(dy);
+            case -1, -2, -3 -> "<".repeat(-dy);
+            default -> throw new IllegalStateException("Valeur inattendue : " + dy);
+        };
+    }
+
+    static numericKeyboard convertirClavierNumerique(char caractere) {
+        return switch (caractere) {
+            case '0' -> numericKeyboard.ZERO;
+            case '1' -> numericKeyboard.ONE;
+            case '2' -> numericKeyboard.TWO;
+            case '3' -> numericKeyboard.THREE;
+            case '4' -> numericKeyboard.FOUR;
+            case '5' -> numericKeyboard.FIVE;
+            case '6' -> numericKeyboard.SIX;
+            case '7' -> numericKeyboard.SEVEN;
+            case '8' -> numericKeyboard.EIGHT;
+            case '9' -> numericKeyboard.NINE;
+            case 'A' -> numericKeyboard.A;
+            default -> throw new IllegalStateException("Valeur inattendue : " + caractere);
+        };
+    }
+
+    static int convertirClavierDirectionnel(char caractere) {
+        return switch (caractere) {
+            case 'A' -> 0;
+            case '^' -> 1;
+            case 'v' -> 2;
+            case '<' -> 3;
+            case '>' -> 4;
+            default -> throw new IllegalStateException("Valeur inattendue : " + caractere);
+        };
+    }
+
+    enum numericKeyboard {
+        ONE(2, 0),
+        TWO(2, 1),
+        THREE(2, 2),
+        FOUR(1, 0),
+        FIVE(1, 1),
+        SIX(1, 2),
+        SEVEN(0, 0),
+        EIGHT(0, 1),
+        NINE(0, 2),
+        ZERO(3, 1),
+        A(3, 2);
+
+        private final Point position;
+
+        numericKeyboard(int x, int y) {
+            position = new Point(x, y);
+        }
+
+        String sequence(numericKeyboard autreClavier) {
+            int dx = autreClavier.position.x - this.position.x;
+            int dy = autreClavier.position.y - this.position.y;
+
+            StringBuilder sequenceBuilder = new StringBuilder();
+
+            if (dy < 0) {
+                if (this.position.x == 3 && autreClavier.position.y == 0) {
+                    sequenceBuilder.append(deplacerEnX(dx)).append(deplacerEnY(dy));
+                } else {
+                    sequenceBuilder.append(deplacerEnY(dy)).append(deplacerEnX(dx));
+                }
+            } else {
+                if (autreClavier.position.x == 3 && this.position.y == 0) {
+                    sequenceBuilder.append(deplacerEnY(dy)).append(deplacerEnX(dx));
+                } else {
+                    sequenceBuilder.append(deplacerEnX(dx)).append(deplacerEnY(dy));
+                }
+            }
+
+            return sequenceBuilder.toString();
+        }
+    }
+
+    enum directionnalKeyboard {
+        UP(0, 1),
+        DOWN(1, 1),
+        LEFT(1, 0),
+        RIGHT(1, 2),
+        A(0, 2);
+
+        private final Point position;
+
+        directionnalKeyboard(int x, int y) {
+            position = new Point(x, y);
+        }
+
+        String sequence(directionnalKeyboard autreClavier) {
+            int dx = autreClavier.position.x - this.position.x;
+            int dy = autreClavier.position.y - this.position.y;
+
+            StringBuilder sequenceBuilder = new StringBuilder();
+
+            if (dy < 0) {
+                if (autreClavier.position.y == 0) {
+                    sequenceBuilder.append(deplacerEnX(dx)).append(deplacerEnY(dy));
+                } else {
+                    sequenceBuilder.append(deplacerEnY(dy)).append(deplacerEnX(dx));
+                }
+            } else {
+                if (this.position.y == 0) {
+                    sequenceBuilder.append(deplacerEnY(dy)).append(deplacerEnX(dx));
+                } else {
+                    sequenceBuilder.append(deplacerEnX(dx)).append(deplacerEnY(dy));
+                }
+            }
+
+            return sequenceBuilder.toString();
+        }
     }
 
 }
