@@ -13,11 +13,10 @@ public class Main {
             long complexiteTotale = 0L;
             int nombreRobotsDirectionnels = 2;
 
-            // Partie 1 : Calcul de la complexité
+            // Partie 1
             for (String code : codes) {
-                // Premier parsing de la chaîne
+                // Premier parsing de la chaîne, avec clavier numerique
                 String parseInitial = Day21Util.parseStringNumerical(code);
-
                 // Application des robots directionnels
                 for (int i = 0; i < nombreRobotsDirectionnels; i++) {
                     parseInitial = Day21Util.parseStringDirectionnal(parseInitial);
@@ -28,11 +27,11 @@ public class Main {
 
             System.out.println("La complexité pour la partie 1 est : " + complexiteTotale);
 
-            // Partie 2 : Calcul avancé de la complexité
+            // Partie 2
             complexiteTotale = 0L;
             codes = Helper.readFileToListString(cheminFichier);
 
-            long[][][] cacheComplexite = new long[25][5][5];
+            long[][][] cache = new long[25][5][5];
             Day21Util.directionnalKeyboard[] claviersDirectionnels = {
                     Day21Util.directionnalKeyboard.A,
                     Day21Util.directionnalKeyboard.UP,
@@ -41,15 +40,15 @@ public class Main {
                     Day21Util.directionnalKeyboard.RIGHT
             };
 
-            // Initialisation du cache de complexité
+            // Initialisation du cache
             for (int j = 0; j < claviersDirectionnels.length; j++) {
                 for (int k = 0; k < claviersDirectionnels.length; k++) {
-                    cacheComplexite[0][j][k] = claviersDirectionnels[j].sequence(claviersDirectionnels[k]).length() + 1;
+                    cache[0][j][k] = claviersDirectionnels[j].sequence(claviersDirectionnels[k]).length() + 1;
                 }
             }
 
-            // Remplissage du cache de complexité
-            for (int i = 1; i < cacheComplexite.length; i++) {
+            // Remplissage du cache
+            for (int i = 1; i < cache.length; i++) {
                 for (int j = 0; j < claviersDirectionnels.length; j++) {
                     for (int k = 0; k < claviersDirectionnels.length; k++) {
                         String sequence = claviersDirectionnels[j].sequence(claviersDirectionnels[k]) + 'A';
@@ -58,10 +57,10 @@ public class Main {
 
                         for (char caractere : sequence.toCharArray()) {
                             int suivant = Day21Util.convertirClavierDirectionnel(caractere);
-                            resultat += cacheComplexite[i - 1][courant][suivant];
+                            resultat += cache[i - 1][courant][suivant];
                             courant = suivant;
                         }
-                        cacheComplexite[i][j][k] = resultat;
+                        cache[i][j][k] = resultat;
                     }
                 }
             }
@@ -83,7 +82,7 @@ public class Main {
 
                 for (char caractere : sequence.toCharArray()) {
                     int suivant = Day21Util.convertirClavierDirectionnel(caractere);
-                    resultat += cacheComplexite[24][courant][suivant];
+                    resultat += cache[24][courant][suivant];
                     courant = suivant;
                 }
 
